@@ -1,6 +1,10 @@
-import React from 'react';
+import React from "react";
 
-const DataTable = ({ data, columns, onRowClick }) => {
+const DataTable = ({ data = [], columns, onRowClick }) => {
+    const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((acc, part) => acc?.[part], obj) || '-';
+    };
+
     return (
         <table className="data-table">
             <thead>
@@ -11,11 +15,11 @@ const DataTable = ({ data, columns, onRowClick }) => {
             </tr>
             </thead>
             <tbody>
-            {data.map((item, index) => (
-                <tr key={index} onClick={() => onRowClick(item)}>
+            {Array.isArray(data) && data.map((item, index) => (
+                <tr key={index} onClick={() => onRowClick?.(item)}>
                     {columns.map((col) => (
                         <td key={col.accessor}>
-                            {col.accessor.split('.').reduce((obj, key) => obj?.[key], item)}
+                            {getNestedValue(item, col.accessor)}
                         </td>
                     ))}
                 </tr>

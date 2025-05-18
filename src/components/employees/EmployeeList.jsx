@@ -1,37 +1,54 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { AppContext } from '../../context/AppContext';
-import DataTable from '../../common/DataTable';
-import CreateButton from '../../common/CreateButton';
+import React, { useEffect, useState } from 'react';
 import { fetchEmployees } from '../../utils/api';
+import { useNavigate } from 'react-router-dom';
+import DataTable from '../../common/DataTable';
 
 const EmployeeList = () => {
     const [employees, setEmployees] = useState([]);
-    const { setSelectedEntity, setCurrentView } = useContext(AppContext);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const [error, setError] = useState(null);
+
+    const columns = [
+        { header: 'Имя', accessor: 'firstName' },
+        { header: 'Фамилия', accessor: 'lastName' },
+        { header: 'Должность', accessor: 'position.name' },
+        { header: 'Тип', accessor: 'employeeType' }
+    ];
 
     useEffect(() => {
         const loadData = async () => {
-            const data = await fetchEmployees();
-            setEmployees(data);
+            try {
+                const response = await fetchEmployees({
+                    page: 0,
+                    size: 20
+                });
+                console.log('API Response:', response.data);
+
+                setEmployees(response.data.content || []);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
         };
         loadData();
     }, []);
 
-    const columns = [
-        { header: 'ФИО', accessor: 'name' },
-        { header: 'Должность', accessor: 'position' },
-        { header: 'Отдел', accessor: 'department.name' }
-    ];
+    if (loading) return <div>Загрузка...</div>;
+
+    if (error) return <div>Ошибка: {error}</div>;
+
+    if (!loading && !error && employees.length === 0) {
+        return <div>Нет данных о сотрудниках</div>;
+    }
 
     return (
         <div className="entity-list">
-            <CreateButton onClick={() => setCurrentView('create')} />
             <DataTable
                 data={employees}
                 columns={columns}
-                onRowClick={(item) => {
-                    setSelectedEntity(item);
-                    setCurrentView('details');
-                }}
+                onRowClick={(empl)  => navigate(`/employees/${empl.id}`)}
             />
         </div>
     );

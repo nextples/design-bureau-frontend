@@ -1,16 +1,18 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import EmployeesList from '../employees/EmployeeList';
 import EmployeeDetails from '../employees/EmployeeDetails';
-// Импортируйте аналогичные компоненты для других сущностей
+import DepartmentDetails from "../departments/DepartmentDetails.jsx";
+import DepartmentList from "../departments/DepartmentList.jsx";
+import EmployeeList from "../employees/EmployeeList";
 
 const MainContent = () => {
     return (
         <div className="main-content">
             <Routes>
-                <Route path="/employees" element={<EmployeesList />} />
+                <Route path="/employees" element={<EmployeeList />} />
                 <Route path="/employees/:id" element={<EmployeeDetails />} />
-                {/* Аналогичные маршруты для других сущностей */}
+                <Route path="/departments" element={<DepartmentList />} />
+                <Route path="/departments/:id" element={<DepartmentDetails />} />
             </Routes>
         </div>
     );
